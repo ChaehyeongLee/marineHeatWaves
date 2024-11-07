@@ -316,7 +316,9 @@ def detect(t, temp, climatologyPeriod=[None,None], pctile=90, windowHalfWidth=5,
     # Fix issue where missing temp vaues (nan) are counted as True
     exceed_bool[np.isnan(exceed_bool)] = False
     # Find contiguous regions of exceed_bool = True
-    events, n_events = ndimage.label(exceed_bool)
+    event_starts = np.diff(exceed_bool.astype(int), prepend=0) == 1
+    events = np.cumsum(event_starts)*exceed_bool
+    n_events = np.nanmax(n_events)
 
     # Find all MHW events of duration >= minDuration
     for ev in range(1,n_events+1):
